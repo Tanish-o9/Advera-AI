@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advera AI — Instant Landing Page Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- TOP HEADER -->
+    <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="{% url 'home' %}" class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-indigo-500/20">
+                    ⚡
+                </div>
+                <span class="font-extrabold text-xl tracking-tight text-white">Advera <span class="text-indigo-400">AI</span></span>
+            </a>
+
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'history' %}" class="text-sm font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                    <span>📊 Dashboard & History</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN FORM CONTAINER -->
+    <main class="max-w-3xl mx-auto px-6 py-12 flex-1 w-full">
+        <div class="text-center mb-10">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-4">
+                🚀 AI-Powered Personalization Engine
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+                Turn Ad Creatives into <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">High-Converting Pages</span>
+            </h1>
+            <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
+                Paste your ad copy or creative, target website URL, and watch AI build a matching, optimized landing page in seconds.
+            </p>
+        </div>
+
+        <!-- GENERATOR CARD -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-slate-950">
+            <form method="POST" action="{% url 'generate' %}" enctype="multipart/form-data" id="generatorForm">
+                {% csrf_token %}
+
+                <!-- SECTION 1: TARGET URL -->
+                <div class="mb-6">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                        Target Landing Page URL <span class="text-pink-500">*</span>
+                    </label>
+                    <input type="url" name="url" placeholder="https://yourbrand.com/product" required
+                        class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-500 text-sm outline-none transition">
+                    <p class="text-xs text-slate-500 mt-1.5">We scrape and align page context with your ad's promise.</p>
+                </div>
+
+                <!-- SECTION 2: AD INPUTS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                            Ad Text / Headline / Offer
+                        </label>
+                        <textarea name="ad_text" rows="3" placeholder="e.g. Get 50% off premium leather sneakers today only!"
+                            class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 text-sm outline-none transition resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                            Ad Creative Link (Optional)
+                        </label>
+                        <input type="text" name="ad_link" placeholder="https://facebook.com/ads/..."
+                            class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-500 text-sm outline-none transition mb-3">
+
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                            Upload Ad Creative Image
+                        </label>
+                        <input type="file" name="ad_image" accept="image/*"
+                            class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-indigo-400 hover:file:bg-slate-700 cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="h-px bg-slate-800 my-6"></div>
+
+                <!-- SECTION 3: STYLE VARIANT & LOGO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                            Optimization Style Variant
+                        </label>
+                        <select name="variant" class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl px-4 py-3.5 text-slate-200 text-sm outline-none cursor-pointer">
+                            <option value="standard" selected>✨ Standard Modern SaaS</option>
+                            <option value="high_urgency">🔥 High Urgency & Conversion Focus</option>
+                            <option value="social_proof">⭐ Social Proof & Testimonials Heavy</option>
+                            <option value="minimalist">🌿 Minimalist & Clean Aesthetics</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                            Brand Logo Upload (Optional)
+                        </label>
+                        <input type="file" name="logo" accept="image/*"
+                            class="w-full text-xs text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-indigo-400 hover:file:bg-slate-700 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" id="submitBtn"
+                    class="w-full py-4 rounded-xl font-extrabold text-white text-base bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 hover:from-indigo-600 hover:to-pink-600 shadow-xl shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
+                    <span>⚡ Generate Personalized Landing Page</span>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-900 py-6 px-6 text-center text-xs text-slate-500">
+        <p>Built with Django, Supabase & AI • Advera AI © 2026</p>
+    </footer>
+
+    <script>
+        document.getElementById('generatorForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing & Generating Landing Page...`;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+        });
+    </script>
+</body>
+</html>
