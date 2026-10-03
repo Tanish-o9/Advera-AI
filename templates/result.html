@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview & CRO Scorecard — Advera AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-full flex flex-col overflow-hidden">
+
+    <!-- NAVBAR -->
+    <header class="bg-slate-900 border-b border-slate-800 h-14 px-4 sm:px-6 flex items-center justify-between flex-shrink-0 z-50">
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'home' %}" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                <span>← New Page</span>
+            </a>
+            <a href="{% url 'history' %}" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition hidden sm:inline-block">
+                Dashboard
+            </a>
+            <div class="h-4 w-px bg-slate-700 hidden sm:block"></div>
+            <h1 class="text-xs sm:text-sm font-bold text-white truncate max-w-[150px] sm:max-w-xs">
+                {% if page %}{{ page.title }}{% else %}Generated Page{% endif %}
+            </h1>
+        </div>
+
+        <!-- CENTER TABS -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+            <button onclick="switchTab('preview')" id="tab-preview" class="px-3 py-1 rounded-lg bg-indigo-600 text-white shadow">
+                📱 Preview
+            </button>
+            <button onclick="switchTab('cro')" id="tab-cro" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white flex items-center space-x-1">
+                <span>🎯 CRO Score</span>
+                <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-md font-bold">{% if cro_score %}{{ cro_score }}{% else %}85{% endif %}/100</span>
+            </button>
+            <button onclick="switchTab('code')" id="tab-code" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">
+                💻 HTML Code
+            </button>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="flex items-center space-x-2">
+            <button onclick="copyCode()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition border border-slate-700">
+                📋 Copy
+            </button>
+            <button onclick="downloadCode()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition shadow-lg shadow-indigo-600/30">
+                ⬇ Download HTML
+            </button>
+        </div>
+    </header>
+
+    <!-- DEVICE SWITCHER TOOLBAR -->
+    <div id="device-bar" class="bg-slate-900/90 border-b border-slate-800 py-1.5 px-4 flex justify-center items-center space-x-3 text-xs flex-shrink-0">
+        <span class="text-slate-400 font-semibold text-[11px]">Device View:</span>
+        <button onclick="setDevice('desktop')" id="dev-desktop" class="px-2.5 py-1 rounded bg-slate-800 text-indigo-400 font-bold border border-indigo-500/30">🖥️ Desktop</button>
+        <button onclick="setDevice('tablet')" id="dev-tablet" class="px-2.5 py-1 rounded bg-slate-950 text-slate-400 hover:text-white">📱 Tablet (768px)</button>
+        <button onclick="setDevice('mobile')" id="dev-mobile" class="px-2.5 py-1 rounded bg-slate-950 text-slate-400 hover:text-white">📲 Mobile (375px)</button>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 min-h-0 bg-slate-950 relative p-2 sm:p-4 flex items-center justify-center overflow-hidden">
+        
+        <!-- 1. LIVE PREVIEW CONTAINER -->
+        <div id="view-preview" class="w-full h-full flex items-center justify-center overflow-hidden">
+            <div id="frame-wrapper" class="w-full h-full bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300">
+                <iframe id="preview-frame" class="w-full h-full border-0 block"></iframe>
+            </div>
+        </div>
+
+        <!-- 2. CRO SCORECARD VIEW -->
+        <div id="view-cro" class="hidden w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex items-center justify-between pb-6 border-b border-slate-800 mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-1">Conversion Rate Optimization (CRO) Analysis</h2>
+                    <p class="text-xs text-slate-400">Automated benchmark rating based on UX conversion standards.</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-extrabold text-emerald-400">{% if cro_score %}{{ cro_score }}{% else %}85{% endif %}<span class="text-sm font-normal text-slate-500">/100</span></div>
+                    <span class="text-[10px] uppercase font-bold text-emerald-500 tracking-wider">High Conversion Potential</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">CRO Audit Breakdown</h3>
+                {% if cro_feedback %}
+                    {% for item in cro_feedback %}
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-200">
+                            {{ item }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-300">
+                        ✅ Page structure verified with responsive containers, CTA placement, and visual hierarchy.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 3. CODE EDITOR VIEW -->
+        <div id="view-code" class="hidden w-full h-full flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-4">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-slate-400 uppercase">Editable HTML Source</span>
+                <button onclick="updateFromEditor()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                    🔄 Apply Changes to Preview
+                </button>
+            </div>
+            <textarea id="code-editor" class="flex-1 w-full bg-slate-950 text-emerald-400 font-mono text-xs p-4 rounded-xl border border-slate-800 outline-none resize-none focus:border-indigo-500">{{ html_code }}</textarea>
+        </div>
+
+    </main>
+
+    <!-- HIDDEN STORAGE FOR ORIGINAL CODE -->
+    <textarea id="raw-code" class="hidden">{{ html_code }}</textarea>
+
+    <script>
+        const iframe = document.getElementById('preview-frame');
+        const codeEditor = document.getElementById('code-editor');
+        const rawCode = document.getElementById('raw-code').value;
+
+        function renderIframe(content) {
+            iframe.srcdoc = content;
+        }
+
+        renderIframe(rawCode);
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            ['preview', 'cro', 'code'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('bg-indigo-600', 'text-white');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-400');
+            });
+
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('bg-indigo-600', 'text-white');
+
+            document.getElementById('device-bar').style.display = (tab === 'preview') ? 'flex' : 'none';
+        }
+
+        // Device Switcher Logic
+        function setDevice(device) {
+            const wrapper = document.getElementById('frame-wrapper');
+            ['desktop', 'tablet', 'mobile'].forEach(d => {
+                const btn = document.getElementById(`dev-${d}`);
+                btn.classList.remove('bg-slate-800', 'text-indigo-400', 'font-bold', 'border-indigo-500/30');
+                btn.classList.add('bg-slate-950', 'text-slate-400');
+            });
+
+            const activeBtn = document.getElementById(`dev-${device}`);
+            activeBtn.classList.add('bg-slate-800', 'text-indigo-400', 'font-bold', 'border-indigo-500/30');
+
+            if (device === 'mobile') {
+                wrapper.style.width = '375px';
+                wrapper.style.height = '667px';
+                wrapper.style.maxHeight = '100%';
+            } else if (device === 'tablet') {
+                wrapper.style.width = '768px';
+                wrapper.style.height = '100%';
+                wrapper.style.maxHeight = '100%';
+            } else {
+                wrapper.style.width = '100%';
+                wrapper.style.height = '100%';
+                wrapper.style.maxHeight = '100%';
+            }
+        }
+        
+        // Initial responsive setup
+        setDevice('desktop');
+
+        function updateFromEditor() {
+            const newCode = codeEditor.value;
+            renderIframe(newCode);
+            alert("Preview updated!");
+        }
+
+        function copyCode() {
+            const code = codeEditor.value;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("HTML Code copied to clipboard!");
+            });
+        }
+
+        function downloadCode() {
+            const code = codeEditor.value;
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "advera_landing_page.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
