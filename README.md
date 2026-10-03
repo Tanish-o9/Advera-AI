@@ -70,8 +70,8 @@ Instead of manually rebuilding landing pages for every campaign, Advera AI appli
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/shauryasjadaunnn12345/AdSync-AI.git
-cd AdSync-AI
+git clone https://github.com/Tanish-o9/Advera-AI.git
+cd Advera-AI
 
 # 2. Create and activate a virtual environment
 python -m venv venv
@@ -91,4 +91,4 @@ The app will be available at `http://127.0.0.1:8000/`.
 
 ---
 
-<p align="center">Powered by <b>Advera AI</b> © 2026</p>
+<p align="center">Made with ❤️ by <a href="https://github.com/Tanish-o9">Tanish Kumar</a></p>
